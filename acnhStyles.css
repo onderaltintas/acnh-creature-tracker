@@ -1,0 +1,125 @@
+/*
+Blue: #8ACED9
+Green: #93CEAE
+Teal: #7FCECB
+Off-White: #FAFCF6;
+*/
+
+body {
+  text-align: center;
+  background-image: url("../Images/acnhImages/leafWallpaper.png");
+  background-repeat: repeat;
+  background-attachment: fixed;
+  background-size: cover;
+  font-family: "Noto Sans TC", sans-serif;
+  color: #0F2A2E;
+}
+
+#topHeading {
+  display: inline-block;
+  width: 850px;
+  border: 12px solid #8ACED9;
+  background-color: #FAFCF6;
+  border-radius: 12px 12px 0 0;
+}
+
+#display {
+  margin: 0 0 12px 0;
+  padding: 6px;
+  font-size: 1em;
+  font-weight: 600;
+  background-color: #7FCECB;
+  color: #E1F4F3;
+  border-radius: 12px;
+  border: 2px solid #379AA9;
+}
+
+#display:hover {
+  background-color: #D5ECDF;
+  color: #7FCECB;
+}
+
+
+
+#charts {
+  background-color: #8ACED9;
+  padding: 12px;
+  margin: auto;
+  width: 850px;
+  border-radius: 0 0 12px 12px;
+}
+
+/* style the tab , note to self, add some media queries....*/
+.tab {
+  margin: auto;
+  width: inherit;
+  overflow: hidden;
+  border: 1px solid #8ACED9;
+  background-color: #E1F4F3;
+  border-radius: 6px;
+  padding: 6px 0 0 0;
+
+}
+
+/* Style the buttons that are used to open the tab content */
+.tab button {
+  background-color: inherit;
+  float: left;
+  border: 1px solid #8ACED9;
+  border-radius: 12px 12px 0 0;
+  outline: none;
+  cursor: pointer;
+  padding: 14px 16px;
+  transition: 0.3s;
+  font-weight: 600;
+}
+
+/* Change background color of buttons on hover */
+.tab button:hover {
+  background-color: #C6E7EC;
+}
+
+/* Create an active/current tablink class */
+.tab button.active {
+  background-color: #A6DDDC;
+}
+
+
+table {
+  margin-left: auto;
+  margin-right: auto;
+  width: 850px;
+  background-color: #8ACED9;
+  border-radius: 6px;
+
+}
+ th:first-child, td:first-child {
+   border-radius: 6px 0 0 6px;
+}
+
+th:last-child {
+  border-radius: 0 6px 6px 0;
+}
+
+th {
+  background-color: #D5ECDF;
+}
+
+td{
+  background-color: #FAFCF6;
+}
+
+th, td {
+  width: 100px;
+  border: 1px solid #C6E7EC;
+
+}
+
+.month, .jan, .feb, .mar, .apr, .may, .jun, .jul,
+.aug, .sept, .oct, .nov, .dec {
+  display: none;
+}
+
+img {
+  width: 50px;
+}
