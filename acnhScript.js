@@ -1,5 +1,8 @@
 //Set variables
 
+//Variables for setting Month
+
+var monthButtons = document.getElementsByClassName("availableMonth");
 var month = new Date().getMonth() + 8;
 
 //Critter availability in the Northern Hemisphere
@@ -40,16 +43,25 @@ for (i = 0; i < tabcontent.length; i++) {
     }
     */
 
-//display all button
-var count = 0;
-function displayAll(){
+//display by month buttons
 
-  var display = document.getElementById("display");
+function displayMonth(x){
+  var month = x + 7;
 
-  if (count === 0) {
-    display.style.backgroundColor = "#D5ECDF";
-    display.style.color = "#7FCECB";
-
+//function to highlight the month button selected
+for (var i = 0; i < monthButtons.length; i++) {
+  monthButtons[i].addEventListener("click", function() {
+    var current = document.getElementsByClassName("monthSelected");
+    // If there's no active class
+    if (current.length > 0) {
+      current[0].className = current[0].className.replace(" monthSelected", "");
+    }
+    // Add the active class to the current/clicked button
+    this.className += " monthSelected";
+  });
+}
+  //Functions to display critters based on buttons clicked
+  if (month === 7) {
     for(var i=0; i < northHemFish.length; i++) {
     northHemFish[i].style.display = "table-row";
   }
@@ -59,14 +71,8 @@ function displayAll(){
     for(var i=0; i < northHemSeaCr.length; i++) {
       northHemSeaCr[i].style.display = "table-row";
     }
-    count = 1;
   }
-
     else {
-
-    display.style.backgroundColor = "#7FCECB";
-    display.style.color = "#E1F4F3";
-
     //Function to display available fish
     for(var i=0; i < northHemFish.length; i++) {
       if(northHemFish[i].getElementsByTagName("td")[month].innerHTML == "x") {
@@ -92,7 +98,6 @@ function displayAll(){
       }else {
         northHemSeaCr[i].style.display = "none";
       }
-    count = 0;
   }
 }
 }
@@ -106,23 +111,26 @@ function displayAll(){
       }else {
         northHemFish[i].style.display = "none";
       }
+      northHemFish[i].getElementsByTagName("td")[7].style.borderRadius = "0 6px 6px 0";
     }
-    //Function to display available bugs
+    //To display available bugs
     for(var i=0; i < northHemBugs.length; i++) {
       if(northHemBugs[i].getElementsByTagName("td")[month-1].innerHTML == "x") {
         northHemBugs[i].style.display = "table-row";
       }else {
         northHemBugs[i].style.display = "none";
       }
+      northHemBugs[i].getElementsByTagName("td")[6].style.borderRadius = "0 6px 6px 0";
     }
 
-    //Function to display Sea creatures Available
+    //To display Sea creatures Available
     for(var i=0; i < northHemSeaCr.length; i++) {
       if(northHemSeaCr[i].getElementsByTagName("td")[month].innerHTML == "x") {
         northHemSeaCr[i].style.display = "table-row";
       }else {
         northHemSeaCr[i].style.display = "none";
       }
+      northHemSeaCr[i].getElementsByTagName("td")[7].style.borderRadius = "0 6px 6px 0";
     }
   tablinks[0].className += " active";
   document.getElementById("bugs").style.display = "none";

@@ -7,7 +7,7 @@ Off-White: #FAFCF6;
 
 body {
   text-align: center;
-  background-image: url("../Images/acnhImages/leafWallpaper.png");
+  background-image: url("Images/leafWallpaper.png");
   background-repeat: repeat;
   background-attachment: fixed;
   background-size: cover;
@@ -18,12 +18,36 @@ body {
 #topHeading {
   display: inline-block;
   width: 850px;
-  border: 12px solid #8ACED9;
+  border: 12px solid #318D9B;
   background-color: #FAFCF6;
   border-radius: 12px 12px 0 0;
 }
 
-#display {
+@media (max-width: 768px) {
+  #topHeading {
+    display: inline-block;
+    width: 600px;
+  }
+}
+/*
+@media (max-width: 450px) {
+  #topHeading {
+    display: inline-block;
+    width: 320px;
+  }
+
+  h1 {
+    font-size: 1.5em;
+  }
+
+  h2 {
+    font-size: 1em;
+  }
+}
+
+ */
+
+.availableMonth {
   margin: 0 0 12px 0;
   padding: 6px;
   font-size: 1em;
@@ -31,10 +55,10 @@ body {
   background-color: #7FCECB;
   color: #E1F4F3;
   border-radius: 12px;
-  border: 2px solid #379AA9;
+  border: 2px solid #318D9B;
 }
 
-#display:hover {
+ .availableMonth:hover, .monthSelected {
   background-color: #D5ECDF;
   color: #7FCECB;
 }
@@ -42,19 +66,35 @@ body {
 
 
 #charts {
-  background-color: #8ACED9;
+  background-color: #318D9B;
   padding: 12px;
   margin: auto;
   width: 850px;
   border-radius: 0 0 12px 12px;
 }
 
+@media (max-width: 768px){
+  #charts {
+    padding: 12px;
+    margin: auto;
+    width: 600px;
+    border-radius: 0 0 12px 12px;
+  }
+}
+ /*
+@media (max-width: 450px) {
+  #charts {
+    padding: 6px;
+    margin: auto;
+    width: 320px;
+  }
+} */
 /* style the tab , note to self, add some media queries....*/
 .tab {
   margin: auto;
   width: inherit;
   overflow: hidden;
-  border: 1px solid #8ACED9;
+  border: 1px solid #318D9B;
   background-color: #E1F4F3;
   border-radius: 6px;
   padding: 6px 0 0 0;
@@ -65,7 +105,7 @@ body {
 .tab button {
   background-color: inherit;
   float: left;
-  border: 1px solid #8ACED9;
+  border: 1px solid #318D9B;
   border-radius: 12px 12px 0 0;
   outline: none;
   cursor: pointer;
@@ -89,10 +129,24 @@ table {
   margin-left: auto;
   margin-right: auto;
   width: 850px;
-  background-color: #8ACED9;
+  background-color: #318D9B;
   border-radius: 6px;
 
 }
+
+@media (max-width: 768px){
+  table {
+    width: 600px;
+  }
+}
+
+/*
+@media (max-width: 450px) {
+  table {
+    width: 320px;
+  }
+}
+ */
  th:first-child, td:first-child {
    border-radius: 6px 0 0 6px;
 }
@@ -111,7 +165,7 @@ td{
 
 th, td {
   width: 100px;
-  border: 1px solid #C6E7EC;
+  border: 1px solid #318D9B;
 
 }
 
