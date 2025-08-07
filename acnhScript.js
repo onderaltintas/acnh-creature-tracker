@@ -3,22 +3,40 @@ let northHemFish = [];
 let northHemBugs = [];
 let northHemSeaCr = [];
 let monthButtons = document.getElementsByClassName("availableMonth");
-let month = new Date().getMonth();
+let month = new Date().getMonth(); // Current month (0-11)
+let isNorthernHemisphere = true; // Default to northern hemisphere
+
+// Hemisphere toggle
+const hemisphereToggle = document.getElementById('hemisphereToggle');
+const hemisphereText = document.getElementById('hemisphereText');
+
+hemisphereToggle.addEventListener('change', function() {
+    isNorthernHemisphere = this.checked;
+    hemisphereText.textContent = isNorthernHemisphere ? 'Kuzey Yarıküre' : 'Güney Yarıküre';
+    
+    // Refresh the display
+    displayMonth(month);
+});
 
 // Tab control functions
 function openList(evt, listName) {
     const tabcontent = document.getElementsByClassName("tabcontent");
     const tablinks = document.getElementsByClassName("tablinks");
     
+    // Hide all tab content
     for (let i = 0; i < tabcontent.length; i++) {
         tabcontent[i].style.display = "none";
     }
     
+    // Remove active class from all tab links
     for (let i = 0; i < tablinks.length; i++) {
         tablinks[i].className = tablinks[i].className.replace(" active", "");
     }
     
+    // Show the specific tab content
     document.getElementById(listName).style.display = "block";
+    
+    // Add active class to the button that opened the tab
     evt.currentTarget.className += " active";
 }
 
@@ -45,92 +63,159 @@ async function loadCreatureData() {
     }
 }
 
-// Create table rows
+// Save capture status to localStorage
+function saveCaptureStatus(type, name, isCaptured) {
+    const key = `captured_${type}_${name}`;
+    localStorage.setItem(key, isCaptured ? 'true' : 'false');
+}
+
+// Load capture status from localStorage
+function loadCaptureStatus(type, name) {
+    const key = `captured_${type}_${name}`;
+    return localStorage.getItem(key) === 'true';
+}
+
+// Create table rows with capture checkbox
 function createTableRow(creature, type) {
     const row = document.createElement('tr');
     row.className = `${type}North`;
     
+    // Add capture checkbox
+    const captureCell = document.createElement('td');
+    const captureCheckbox = document.createElement('input');
+    captureCheckbox.type = 'checkbox';
+    captureCheckbox.className = 'capture-checkbox';
+    
+    // Load capture status from localStorage
+    const isCaptured = loadCaptureStatus(type, creature.name);
+    captureCheckbox.checked = isCaptured;
+    
+    // Save status when checkbox changes
+    captureCheckbox.addEventListener('change', function() {
+        saveCaptureStatus(type, creature.name, this.checked);
+    });
+    
+    captureCell.appendChild(captureCheckbox);
+    row.appendChild(captureCell);
+    
     // Add name
     const nameCell = document.createElement('td');
-    nameCell.textContent = creature.Name;
+    nameCell.textContent = creature.name;
     row.appendChild(nameCell);
     
     // Add image
     const imgCell = document.createElement('td');
     const img = document.createElement('img');
-    img.src = creature.Image;
-    img.alt = creature.Name;
+    img.src = creature.image;
+    img.alt = creature.name;
     img.width = 50;
     imgCell.appendChild(img);
     row.appendChild(imgCell);
     
     // Add price
     const priceCell = document.createElement('td');
-    priceCell.textContent = creature.Price;
+    priceCell.textContent = creature.price;
     row.appendChild(priceCell);
     
     // Add location
     const locationCell = document.createElement('td');
-    locationCell.textContent = creature.Location;
+    
+    // Handle different location fields
+    if (type === 'sea') {
+        locationCell.textContent = creature.shadowSize || creature.swimmingPattern || '';
+    } else {
+        locationCell.textContent = creature.location || '';
+    }
+    
     row.appendChild(locationCell);
     
     // Add time
     const timeCell = document.createElement('td');
-    timeCell.textContent = creature.Time;
+    timeCell.textContent = creature.time;
     row.appendChild(timeCell);
     
-    // Add months
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    months.forEach(month => {
+    // Add months based on hemisphere
+    const months = isNorthernHemisphere ? creature.months.north : creature.months.south;
+    for (let i = 0; i < 12; i++) {
         const monthCell = document.createElement('td');
-        monthCell.textContent = creature[month] ? 'x' : '';
+        monthCell.textContent = months[i] ? 'x' : '';
         row.appendChild(monthCell);
-    });
+    }
     
     return row;
 }
 
-// Display creatures for selected month
+// Display creatures for selected month with hemisphere support
 function displayMonth(selectedMonth) {
     month = selectedMonth;
     highlightMonth(selectedMonth);
     
+    // Get current hemisphere months
+    const hemisphere = isNorthernHemisphere ? 'north' : 'south';
+    
     // Filter fish
-    northHemFish.forEach(row => {
-        const monthCells = row.getElementsByTagName('td');
-        // +5 because first 5 columns are not months
-        if (monthCells[5 + selectedMonth].textContent === 'x') {
-            row.style.display = 'table-row';
-        } else {
-            row.style.display = 'none';
-        }
-    });
+    if (northHemFish.length > 0) {
+        Array.from(northHemFish).forEach(row => {
+            // Get creature name to find in JSON
+            const name = row.cells[1].textContent; // Index 1 now (0 is checkbox)
+            const creature = creatureData.fish.find(f => f.name === name);
+            
+            if (creature) {
+                const months = creature.months[hemisphere];
+                if (months[selectedMonth]) {
+                    row.style.display = 'table-row';
+                } else {
+                    row.style.display = 'none';
+                }
+            }
+        });
+    }
     
     // Filter bugs
-    northHemBugs.forEach(row => {
-        const monthCells = row.getElementsByTagName('td');
-        if (monthCells[5 + selectedMonth].textContent === 'x') {
-            row.style.display = 'table-row';
-        } else {
-            row.style.display = 'none';
-        }
-    });
+    if (northHemBugs.length > 0) {
+        Array.from(northHemBugs).forEach(row => {
+            const name = row.cells[1].textContent; // Index 1 now (0 is checkbox)
+            const creature = creatureData.bugs.find(b => b.name === name);
+            
+            if (creature) {
+                const months = creature.months[hemisphere];
+                if (months[selectedMonth]) {
+                    row.style.display = 'table-row';
+                } else {
+                    row.style.display = 'none';
+                }
+            }
+        });
+    }
     
     // Filter sea creatures
-    northHemSeaCr.forEach(row => {
-        const monthCells = row.getElementsByTagName('td');
-        if (monthCells[5 + selectedMonth].textContent === 'x') {
-            row.style.display = 'table-row';
-        } else {
-            row.style.display = 'none';
-        }
-    });
+    if (northHemSeaCr.length > 0) {
+        Array.from(northHemSeaCr).forEach(row => {
+            const name = row.cells[1].textContent; // Index 1 now (0 is checkbox)
+            const creature = creatureData.seaCreatures.find(s => s.name === name);
+            
+            if (creature) {
+                const months = creature.months[hemisphere];
+                if (months[selectedMonth]) {
+                    row.style.display = 'table-row';
+                } else {
+                    row.style.display = 'none';
+                }
+            }
+        });
+    }
 }
+
+// Global creature data
+let creatureData;
 
 // Initialize page
 async function initPage() {
-    const creatureData = await loadCreatureData();
-    if (!creatureData) return;
+    const data = await loadCreatureData();
+    if (!data) return;
+    
+    // Save creature data globally
+    creatureData = data;
     
     // Populate fish table
     const fishBody = document.getElementById('fish-body');
@@ -164,8 +249,16 @@ async function initPage() {
     displayMonth(currentMonth);
     
     // Set default tab
+    document.getElementById('bugs').style.display = 'none';
+    document.getElementById('seaCreatures').style.display = 'none';
     document.getElementById('fish').style.display = 'block';
-    document.getElementsByClassName('tablinks')[0].classList.add('active');
+    
+    // Set active tab
+    const tablinks = document.getElementsByClassName('tablinks');
+    for (let i = 0; i < tablinks.length; i++) {
+        tablinks[i].classList.remove('active');
+    }
+    tablinks[0].classList.add('active');
 }
 
 // Start the application
