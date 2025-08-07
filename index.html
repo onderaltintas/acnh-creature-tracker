@@ -9,63 +9,82 @@
 </head>
 <body>
     <div id="topHeading">
-        <h1>Animal Crossing: New Horizons</h1>
-        <h2>Animal Crossing Yakalama Takipçisi</h2>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h1>Animal Crossing: New Horizons</h1>
+                <h2 id="appSubtitle">Animal Crossing Yakalama Takipçisi</h2>
+            </div>
+            <div id="languageSelector">
+                <label for="languageSelect">Dil:</label>
+                <select id="languageSelect">
+                    <option value="tr">Türkçe</option>
+                    <option value="en">English</option>
+                </select>
+            </div>
+        </div>
         
-        <!-- Yarıküre Seçimi -->
+        <!-- Yarıküre Seçimi ve Filtreler -->
         <div id="hemisphere">
             <label>
                 <input type="checkbox" id="hemisphereToggle" checked>
                 <span id="hemisphereText">Kuzey Yarıküre</span>
             </label>
+            <label>
+                <input type="checkbox" id="uncaughtToggle">
+                <span id="uncaughtText">Yakalanmayanlar</span>
+            </label>
+            <label>
+                <input type="checkbox" id="activeNowToggle">
+                <span id="activeNowText">Şu Anda Aktif</span>
+            </label>
         </div>
         
         <!-- Ay Butonları -->
         <div id="monthButtons">
-            <button class="availableMonth" onclick="displayMonth(0)">Ocak</button>
-            <button class="availableMonth" onclick="displayMonth(1)">Şubat</button>
-            <button class="availableMonth" onclick="displayMonth(2)">Mart</button>
-            <button class="availableMonth" onclick="displayMonth(3)">Nisan</button>
-            <button class="availableMonth" onclick="displayMonth(4)">Mayıs</button>
-            <button class="availableMonth" onclick="displayMonth(5)">Haziran</button>
-            <button class="availableMonth" onclick="displayMonth(6)">Temmuz</button>
-            <button class="availableMonth" onclick="displayMonth(7)">Ağustos</button>
-            <button class="availableMonth" onclick="displayMonth(8)">Eylül</button>
-            <button class="availableMonth" onclick="displayMonth(9)">Ekim</button>
-            <button class="availableMonth" onclick="displayMonth(10)">Kasım</button>
-            <button class="availableMonth" onclick="displayMonth(11)">Aralık</button>
+            <button class="availableMonth" onclick="setMonthAndUpdate(0)">Ocak</button>
+            <button class="availableMonth" onclick="setMonthAndUpdate(1)">Şubat</button>
+            <button class="availableMonth" onclick="setMonthAndUpdate(2)">Mart</button>
+            <button class="availableMonth" onclick="setMonthAndUpdate(3)">Nisan</button>
+            <button class="availableMonth" onclick="setMonthAndUpdate(4)">Mayıs</button>
+            <button class="availableMonth" onclick="setMonthAndUpdate(5)">Haziran</button>
+            <button class="availableMonth" onclick="setMonthAndUpdate(6)">Temmuz</button>
+            <button class="availableMonth" onclick="setMonthAndUpdate(7)">Ağustos</button>
+            <button class="availableMonth" onclick="setMonthAndUpdate(8)">Eylül</button>
+            <button class="availableMonth" onclick="setMonthAndUpdate(9)">Ekim</button>
+            <button class="availableMonth" onclick="setMonthAndUpdate(10)">Kasım</button>
+            <button class="availableMonth" onclick="setMonthAndUpdate(11)">Aralık</button>
         </div>
     </div>
 
     <div id="charts">
         <div class="tab">
-            <button class="tablinks" onclick="openList(event, 'fish')">Balıklar</button>
-            <button class="tablinks" onclick="openList(event, 'bugs')">Böcekler</button>
-            <button class="tablinks" onclick="openList(event, 'seaCreatures')">Deniz Canlıları</button>
+            <button class="tablinks" id="fishTab" onclick="openList(event, 'fish')">Balıklar</button>
+            <button class="tablinks" id="bugsTab" onclick="openList(event, 'bugs')">Böcekler</button>
+            <button class="tablinks" id="seaTab" onclick="openList(event, 'seaCreatures')">Deniz Canlıları</button>
         </div>
 
         <div id="fish" class="tabcontent">
             <table>
                 <thead>
                     <tr>
-                        <th>Yakalandı</th> <!-- Yeni sütun -->
-                        <th>İsim</th>
-                        <th>Resim</th>
-                        <th>Fiyat</th>
-                        <th>Konum</th>
-                        <th>Zaman</th>
-                        <th>Ock</th>
-                        <th>Şub</th>
-                        <th>Mar</th>
-                        <th>Nis</th>
-                        <th>May</th>
-                        <th>Haz</th>
-                        <th>Tem</th>
-                        <th>Ağu</th>
-                        <th>Eyl</th>
-                        <th>Ekm</th>
-                        <th>Kas</th>
-                        <th>Ara</th>
+                        <th id="capturedHeader">Yakalandı</th>
+                        <th id="nameHeader">İsim</th>
+                        <th id="imageHeader">Resim</th>
+                        <th id="priceHeader">Fiyat</th>
+                        <th id="locationHeader">Konum</th>
+                        <th id="timeHeader">Zaman</th>
+                        <th id="janHeader">Ock</th>
+                        <th id="febHeader">Şub</th>
+                        <th id="marHeader">Mar</th>
+                        <th id="aprHeader">Nis</th>
+                        <th id="mayHeader">May</th>
+                        <th id="junHeader">Haz</th>
+                        <th id="julHeader">Tem</th>
+                        <th id="augHeader">Ağu</th>
+                        <th id="sepHeader">Eyl</th>
+                        <th id="octHeader">Ekm</th>
+                        <th id="novHeader">Kas</th>
+                        <th id="decHeader">Ara</th>
                     </tr>
                 </thead>
                 <tbody id="fish-body"></tbody>
@@ -76,7 +95,7 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Yakalandı</th> <!-- Yeni sütun -->
+                        <th>Yakalandı</th>
                         <th>İsim</th>
                         <th>Resim</th>
                         <th>Fiyat</th>
@@ -104,7 +123,7 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Yakalandı</th> <!-- Yeni sütun -->
+                        <th>Yakalandı</th>
                         <th>İsim</th>
                         <th>Resim</th>
                         <th>Fiyat</th>

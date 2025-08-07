@@ -5,17 +5,138 @@ let northHemSeaCr = [];
 let monthButtons = document.getElementsByClassName("availableMonth");
 let month = new Date().getMonth(); // Current month (0-11)
 let isNorthernHemisphere = true; // Default to northern hemisphere
+let currentLanguage = 'tr'; // Default language
+let translationData = {}; // Will store translations
+let creatureData = {}; // Global creature data
 
-// Hemisphere toggle
+// Hemisphere and uncaught toggle
 const hemisphereToggle = document.getElementById('hemisphereToggle');
 const hemisphereText = document.getElementById('hemisphereText');
+const uncaughtToggle = document.getElementById('uncaughtToggle');
+const activeNowToggle = document.getElementById('activeNowToggle');
+const languageSelect = document.getElementById('languageSelect');
 
+// Load translations
+async function loadTranslations() {
+    try {
+        const response = await fetch('translations.json');
+        return response.json();
+    } catch (error) {
+        console.error("Çeviriler yüklenirken hata oluştu:", error);
+        return {};
+    }
+}
+
+// Apply translations to UI
+function applyTranslations(lang) {
+    const t = translationData[lang] || {};
+    
+    // Update UI elements
+    document.getElementById('appSubtitle').textContent = t.app_title || 'Animal Crossing Yakalama Takipçisi';
+    hemisphereText.textContent = isNorthernHemisphere ? 
+        (t.northern_hemisphere || 'Kuzey Yarıküre') : 
+        (t.southern_hemisphere || 'Güney Yarıküre');
+    
+    document.getElementById('uncaughtText').textContent = t.show_uncaught || 'Yakalanmayanlar';
+    document.getElementById('activeNowText').textContent = t.active_now || 'Şu Anda Aktif';
+    
+    document.getElementById('fishTab').textContent = t.fish || 'Balıklar';
+    document.getElementById('bugsTab').textContent = t.bugs || 'Böcekler';
+    document.getElementById('seaTab').textContent = t.sea_creatures || 'Deniz Canlıları';
+    
+    document.getElementById('capturedHeader').textContent = t.captured || 'Yakalandı';
+    document.getElementById('nameHeader').textContent = t.name || 'İsim';
+    document.getElementById('imageHeader').textContent = t.image || 'Resim';
+    document.getElementById('priceHeader').textContent = t.price || 'Fiyat';
+    document.getElementById('locationHeader').textContent = t.location || 'Konum';
+    document.getElementById('timeHeader').textContent = t.time || 'Zaman';
+    
+    // Update month headers
+    const monthAbbr = lang === 'tr' ? 
+        ["Ock", "Şub", "Mar", "Nis", "May", "Haz", "Tem", "Ağu", "Eyl", "Ekm", "Kas", "Ara"] :
+        ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    
+    document.getElementById('janHeader').textContent = monthAbbr[0];
+    document.getElementById('febHeader').textContent = monthAbbr[1];
+    document.getElementById('marHeader').textContent = monthAbbr[2];
+    document.getElementById('aprHeader').textContent = monthAbbr[3];
+    document.getElementById('mayHeader').textContent = monthAbbr[4];
+    document.getElementById('junHeader').textContent = monthAbbr[5];
+    document.getElementById('julHeader').textContent = monthAbbr[6];
+    document.getElementById('augHeader').textContent = monthAbbr[7];
+    document.getElementById('sepHeader').textContent = monthAbbr[8];
+    document.getElementById('octHeader').textContent = monthAbbr[9];
+    document.getElementById('novHeader').textContent = monthAbbr[10];
+    document.getElementById('decHeader').textContent = monthAbbr[11];
+    
+    // Update month buttons
+    const monthNames = lang === 'tr' ? 
+        ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"] :
+        ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    
+    for (let i = 0; i < monthButtons.length; i++) {
+        monthButtons[i].textContent = monthNames[i];
+    }
+}
+
+// Change language
+function changeLanguage(lang) {
+    currentLanguage = lang;
+    localStorage.setItem('language', lang);
+    applyTranslations(lang);
+    
+    // Re-render tables to update translations
+    if (creatureData.fish) {
+        populateTables();
+        updateDisplay();
+    }
+}
+
+// Translate a string with case-insensitive and partial matching
+function translate(text) {
+    if (!text) return '';
+    
+    const t = translationData[currentLanguage] || {};
+    
+    // First try exact match
+    if (t[text]) {
+        return t[text];
+    }
+    
+    // Then try case-insensitive match
+    const lowerText = text.toLowerCase();
+    for (const key in t) {
+        if (key.toLowerCase() === lowerText) {
+            return t[key];
+        }
+    }
+    
+    // Finally, try to match known patterns
+    if (lowerText.includes("small")) return t["Small"] || text;
+    if (lowerText.includes("medium")) return t["Medium"] || text;
+    if (lowerText.includes("large")) return t["Large"] || text;
+    if (lowerText.includes("huge")) return t["Huge"] || text;
+    if (lowerText.includes("narrow")) return t["Narrow"] || text;
+    if (lowerText.includes("on tree")) return t["On Trees"] || text;
+    if (lowerText.includes("slow")) return t["Slow"] || text;
+    if (lowerText.includes("quick")) return t["Quick"] || text;
+    if (lowerText.includes("moderate")) return t["Moderate"] || text;
+    if (lowerText.includes("fast")) return t["Fast"] || text;
+    
+    return text;
+}
+
+// Event listeners
 hemisphereToggle.addEventListener('change', function() {
     isNorthernHemisphere = this.checked;
-    hemisphereText.textContent = isNorthernHemisphere ? 'Kuzey Yarıküre' : 'Güney Yarıküre';
-    
-    // Refresh the display
-    displayMonth(month);
+    applyTranslations(currentLanguage);
+    updateDisplay();
+});
+
+uncaughtToggle.addEventListener('change', updateDisplay);
+activeNowToggle.addEventListener('change', updateDisplay);
+languageSelect.addEventListener('change', function() {
+    changeLanguage(this.value);
 });
 
 // Tab control functions
@@ -51,12 +172,18 @@ function highlightMonth(selectedIndex) {
     }
 }
 
+// Set month and update display
+function setMonthAndUpdate(selectedMonth) {
+    month = selectedMonth;
+    highlightMonth(selectedMonth);
+    updateDisplay();
+}
+
 // Load creature data from JSON
 async function loadCreatureData() {
     try {
         const response = await fetch('creatures.json');
-        const data = await response.json();
-        return data;
+        return response.json();
     } catch (error) {
         console.error("Veri yüklenirken hata oluştu:", error);
         return null;
@@ -93,12 +220,13 @@ function createTableRow(creature, type) {
     // Save status when checkbox changes
     captureCheckbox.addEventListener('change', function() {
         saveCaptureStatus(type, creature.name, this.checked);
+        updateDisplay(); // Update display after status change
     });
     
     captureCell.appendChild(captureCheckbox);
     row.appendChild(captureCell);
     
-    // Add name
+    // Add name (no translation)
     const nameCell = document.createElement('td');
     nameCell.textContent = creature.name;
     row.appendChild(nameCell);
@@ -117,21 +245,26 @@ function createTableRow(creature, type) {
     priceCell.textContent = creature.price;
     row.appendChild(priceCell);
     
-    // Add location
+    // Add location (with translation)
     const locationCell = document.createElement('td');
     
     // Handle different location fields
     if (type === 'sea') {
-        locationCell.textContent = creature.shadowSize || creature.swimmingPattern || '';
+        // Translate sea creature attributes
+        let locationText = '';
+        if (creature.shadowSize) locationText += translate(creature.shadowSize) + ' ';
+        if (creature.swimmingPattern) locationText += translate(creature.swimmingPattern);
+        locationCell.textContent = locationText.trim();
     } else {
-        locationCell.textContent = creature.location || '';
+        // Translate location
+        locationCell.textContent = translate(creature.location) || '';
     }
     
     row.appendChild(locationCell);
     
-    // Add time
+    // Add time (with translation)
     const timeCell = document.createElement('td');
-    timeCell.textContent = creature.time;
+    timeCell.textContent = translate(creature.time) || '';
     row.appendChild(timeCell);
     
     // Add months based on hemisphere
@@ -145,24 +278,119 @@ function createTableRow(creature, type) {
     return row;
 }
 
-// Display creatures for selected month with hemisphere support
-function displayMonth(selectedMonth) {
-    month = selectedMonth;
-    highlightMonth(selectedMonth);
+// Convert time string to minutes
+function timeToMinutes(timeStr) {
+    const time = timeStr.trim().toUpperCase();
+    let hour, minute = 0;
+    let period = "";
     
-    // Get current hemisphere months
+    if (time.includes("AM") || time.includes("PM")) {
+        if (time.includes("AM")) {
+            period = "AM";
+        } else {
+            period = "PM";
+        }
+        
+        // Extract time part
+        const timePart = time.replace("AM", "").replace("PM", "").trim();
+        const parts = timePart.split(':');
+        
+        hour = parseInt(parts[0]);
+        minute = parts.length > 1 ? parseInt(parts[1]) : 0;
+        
+        // Handle 12AM and 12PM
+        if (period === "AM" && hour === 12) {
+            hour = 0;
+        } else if (period === "PM" && hour !== 12) {
+            hour += 12;
+        }
+    } else {
+        // Handle 24-hour format if needed
+        const parts = time.split(':');
+        hour = parseInt(parts[0]);
+        minute = parts.length > 1 ? parseInt(parts[1]) : 0;
+    }
+    
+    return hour * 60 + minute;
+}
+
+// Check if creature is active now
+function isActiveNow(timeRange) {
+    if (!timeRange) return false;
+    
+    // "Tüm gün" kontrolü
+    if (timeRange.includes("Tüm gün") || 
+        timeRange.includes("All day") || 
+        timeRange.includes("All Day")) {
+        return true;
+    }
+    
+    const now = new Date();
+    const currentHours = now.getHours();
+    const currentMinutes = now.getMinutes();
+    const currentTotalMinutes = currentHours * 60 + currentMinutes;
+    
+    // Birden fazla zaman aralığı varsa (örneğin: "9AM-4PM & 9PM-4AM")
+    const timeRanges = timeRange.split('&').map(t => t.trim());
+    
+    for (const range of timeRanges) {
+        const [startStr, endStr] = range.split('-').map(s => s.trim());
+        
+        try {
+            const startMinutes = timeToMinutes(startStr);
+            let endMinutes = timeToMinutes(endStr);
+            
+            // Gece yarısını geçen zaman aralıkları
+            if (endMinutes < startMinutes) {
+                // Gece yarısını geçen aralıklar için endMinutes'i 24 saat ekleyerek ayarla
+                if (currentTotalMinutes >= startMinutes) {
+                    // Gece yarısından önceki kısım
+                    if (currentTotalMinutes >= startMinutes && currentTotalMinutes <= (24 * 60)) {
+                        return true;
+                    }
+                } else {
+                    // Gece yarısından sonraki kısım
+                    if (currentTotalMinutes <= endMinutes) {
+                        return true;
+                    }
+                }
+            } else {
+                // Normal zaman aralığı
+                if (currentTotalMinutes >= startMinutes && currentTotalMinutes <= endMinutes) {
+                    return true;
+                }
+            }
+        } catch (e) {
+            console.error("Zaman aralığı ayrıştırma hatası:", e);
+        }
+    }
+    
+    return false;
+}
+
+// Update display based on filters
+function updateDisplay() {
+    const showOnlyUncaught = uncaughtToggle.checked;
+    const showActiveNow = activeNowToggle.checked;
     const hemisphere = isNorthernHemisphere ? 'north' : 'south';
+    
+    // Use the selected month instead of current real month
+    const selectedMonth = month;
     
     // Filter fish
     if (northHemFish.length > 0) {
         Array.from(northHemFish).forEach(row => {
-            // Get creature name to find in JSON
-            const name = row.cells[1].textContent; // Index 1 now (0 is checkbox)
+            const name = row.cells[1].textContent;
             const creature = creatureData.fish.find(f => f.name === name);
+            const captureCheckbox = row.querySelector('.capture-checkbox');
+            const isCaptured = captureCheckbox.checked;
             
             if (creature) {
                 const months = creature.months[hemisphere];
-                if (months[selectedMonth]) {
+                const isAvailable = months[selectedMonth]; // Use selected month
+                const isActive = showActiveNow ? isActiveNow(creature.time) : true;
+                
+                if (isAvailable && isActive && (!showOnlyUncaught || !isCaptured)) {
                     row.style.display = 'table-row';
                 } else {
                     row.style.display = 'none';
@@ -174,12 +402,17 @@ function displayMonth(selectedMonth) {
     // Filter bugs
     if (northHemBugs.length > 0) {
         Array.from(northHemBugs).forEach(row => {
-            const name = row.cells[1].textContent; // Index 1 now (0 is checkbox)
+            const name = row.cells[1].textContent;
             const creature = creatureData.bugs.find(b => b.name === name);
+            const captureCheckbox = row.querySelector('.capture-checkbox');
+            const isCaptured = captureCheckbox.checked;
             
             if (creature) {
                 const months = creature.months[hemisphere];
-                if (months[selectedMonth]) {
+                const isAvailable = months[selectedMonth]; // Use selected month
+                const isActive = showActiveNow ? isActiveNow(creature.time) : true;
+                
+                if (isAvailable && isActive && (!showOnlyUncaught || !isCaptured)) {
                     row.style.display = 'table-row';
                 } else {
                     row.style.display = 'none';
@@ -191,12 +424,17 @@ function displayMonth(selectedMonth) {
     // Filter sea creatures
     if (northHemSeaCr.length > 0) {
         Array.from(northHemSeaCr).forEach(row => {
-            const name = row.cells[1].textContent; // Index 1 now (0 is checkbox)
+            const name = row.cells[1].textContent;
             const creature = creatureData.seaCreatures.find(s => s.name === name);
+            const captureCheckbox = row.querySelector('.capture-checkbox');
+            const isCaptured = captureCheckbox.checked;
             
             if (creature) {
                 const months = creature.months[hemisphere];
-                if (months[selectedMonth]) {
+                const isAvailable = months[selectedMonth]; // Use selected month
+                const isActive = showActiveNow ? isActiveNow(creature.time) : true;
+                
+                if (isAvailable && isActive && (!showOnlyUncaught || !isCaptured)) {
                     row.style.display = 'table-row';
                 } else {
                     row.style.display = 'none';
@@ -206,16 +444,12 @@ function displayMonth(selectedMonth) {
     }
 }
 
-// Global creature data
-let creatureData;
-
-// Initialize page
-async function initPage() {
-    const data = await loadCreatureData();
-    if (!data) return;
-    
-    // Save creature data globally
-    creatureData = data;
+// Populate tables with creature data
+function populateTables() {
+    // Clear existing tables
+    document.getElementById('fish-body').innerHTML = '';
+    document.getElementById('bugs-body').innerHTML = '';
+    document.getElementById('seaCreatures-body').innerHTML = '';
     
     // Populate fish table
     const fishBody = document.getElementById('fish-body');
@@ -242,11 +476,33 @@ async function initPage() {
     northHemFish = document.getElementsByClassName('fishNorth');
     northHemBugs = document.getElementsByClassName('bugsNorth');
     northHemSeaCr = document.getElementsByClassName('seaNorth');
+}
+
+// Initialize page
+async function initPage() {
+    // Load translations and creature data
+    translationData = await loadTranslations();
+    const data = await loadCreatureData();
+    if (!data) return;
+    
+    // Save creature data globally
+    creatureData = data;
+    
+    // Set language from localStorage or default
+    const savedLang = localStorage.getItem('language') || 'tr';
+    currentLanguage = savedLang;
+    document.getElementById('languageSelect').value = savedLang;
+    
+    // Apply translations
+    applyTranslations(savedLang);
+    
+    // Populate tables
+    populateTables();
     
     // Set current month as default
     const currentMonth = new Date().getMonth();
     highlightMonth(currentMonth);
-    displayMonth(currentMonth);
+    updateDisplay();
     
     // Set default tab
     document.getElementById('bugs').style.display = 'none';
