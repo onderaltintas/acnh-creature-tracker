@@ -3,14 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Animal Crossing Balık Rehberi</title>
+    <title>Animal Crossing Yakalama Takipçisi</title>
     <link rel="stylesheet" href="acnhStyles.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <div id="topHeading">
         <h1>Animal Crossing: New Horizons</h1>
-        <h2>Kuzey Yarımküre Balık Rehberi</h2>
+        <h2>Animal Crossing Yakalama Takipçisi</h2>
+        
+        <!-- Yarıküre Seçimi -->
+        <div id="hemisphere">
+            <label>
+                <input type="checkbox" id="hemisphereToggle" checked>
+                <span id="hemisphereText">Kuzey Yarıküre</span>
+            </label>
+        </div>
         
         <!-- Ay Butonları -->
         <div id="monthButtons">
@@ -30,18 +38,17 @@
     </div>
 
     <div id="charts">
-        <!-- Tab Butonları -->
         <div class="tab">
             <button class="tablinks" onclick="openList(event, 'fish')">Balıklar</button>
             <button class="tablinks" onclick="openList(event, 'bugs')">Böcekler</button>
             <button class="tablinks" onclick="openList(event, 'seaCreatures')">Deniz Canlıları</button>
         </div>
 
-        <!-- Balık Tablosu -->
         <div id="fish" class="tabcontent">
             <table>
                 <thead>
                     <tr>
+                        <th>Yakalandı</th> <!-- Yeni sütun -->
                         <th>İsim</th>
                         <th>Resim</th>
                         <th>Fiyat</th>
@@ -65,11 +72,11 @@
             </table>
         </div>
 
-        <!-- Böcek Tablosu -->
         <div id="bugs" class="tabcontent">
             <table>
                 <thead>
                     <tr>
+                        <th>Yakalandı</th> <!-- Yeni sütun -->
                         <th>İsim</th>
                         <th>Resim</th>
                         <th>Fiyat</th>
@@ -93,11 +100,11 @@
             </table>
         </div>
 
-        <!-- Deniz Canlıları Tablosu -->
         <div id="seaCreatures" class="tabcontent">
             <table>
                 <thead>
                     <tr>
+                        <th>Yakalandı</th> <!-- Yeni sütun -->
                         <th>İsim</th>
                         <th>Resim</th>
                         <th>Fiyat</th>
