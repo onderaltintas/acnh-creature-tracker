@@ -3,7 +3,7 @@
     "app_title": "Animal Crossing Yakalama Takipçisi",
     "active_creatures": "Aktif Canlılar",
     "show_uncaught": "Yakalanmayanlar",
-    "active_now": "Şu Anda Aktif",
+    "active_now_button": "Şu An",
     "northern_hemisphere": "Kuzey Yarıküre",
     "southern_hemisphere": "Güney Yarıküre",
     "fish": "Balıklar",
@@ -87,13 +87,13 @@
     "Moderate": "Orta",
     "Slow short movement": "Yavaş kısa hareket",
     "On trees": "Ağaçlarda",
-    "Trees": "Ağaçlar"
+    "Trees": "Ağaçlar"  
   },
   "en": {
     "app_title": "Animal Crossing Creature Tracker",
     "active_creatures": "Active Creatures",
     "show_uncaught": "Uncaught Only",
-    "active_now": "Active Now",
+    "active_now_button": "Now",
     "northern_hemisphere": "Northern Hemisphere",
     "southern_hemisphere": "Southern Hemisphere",
     "fish": "Fish",
@@ -177,6 +177,6 @@
     "Moderate": "Moderate",
     "Slow short movement": "Slow short movement",
     "On trees": "On trees",
-    "Trees": "Trees" 
+    "Trees": "Trees"  
   }
 }
